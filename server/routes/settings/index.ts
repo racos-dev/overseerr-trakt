@@ -61,7 +61,11 @@ settingsRoutes.get('/main', (req, res, next) => {
     return next({ status: 400, message: 'User missing from request.' });
   }
 
-  res.status(200).json(filteredMainSettings(req.user, settings.main));
+  const mainSettings = filteredMainSettings(req.user, settings.main);
+  return res.status(200).json({
+    ...mainSettings,
+    trakt: settings.trakt,
+  });
 });
 
 settingsRoutes.post('/main', (req, res) => {
@@ -70,7 +74,13 @@ settingsRoutes.post('/main', (req, res) => {
   settings.main = merge(settings.main, req.body);
   settings.save();
 
-  return res.status(200).json(settings.main);
+  const mainSettings = settings.main;
+  const traktSettings = settings.trakt;
+
+  return res.status(200).json({
+    ...mainSettings,
+    trakt: traktSettings,
+  });
 });
 
 settingsRoutes.post('/main/regenerate', (req, res, next) => {

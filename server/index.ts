@@ -221,6 +221,6 @@ app
     }
   })
   .catch((err) => {
-    logger.error(err.stack);
+    logger.error('Server startup error:', { error: err, stack: err?.stack });
     process.exit(1);
   });

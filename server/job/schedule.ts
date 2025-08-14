@@ -25,7 +25,9 @@ interface ScheduledJob {
 export const scheduledJobs: ScheduledJob[] = [];
 
 export const startJobs = (): void => {
+  logger.info('Starting jobs initialization', { label: 'Jobs' });
   const jobs = getSettings().jobs;
+  logger.info('Jobs configuration loaded', { label: 'Jobs' });
 
   // Run recently added plex scan every 5 minutes
   scheduledJobs.push({
@@ -184,4 +186,5 @@ export const startJobs = (): void => {
   });
 
   logger.info('Scheduled jobs loaded', { label: 'Jobs' });
+  logger.info('Jobs initialization completed', { label: 'Jobs' });
 };

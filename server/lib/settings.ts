@@ -44,6 +44,16 @@ export interface TautulliSettings {
   externalUrl?: string;
 }
 
+export interface TraktSettings {
+  clientId: string;
+  clientSecret: string;
+  accessToken?: string;
+  refreshToken?: string;
+  username?: string;
+  enabled: boolean;
+  syncWatchlist: boolean;
+}
+
 export interface DVRSettings {
   id: number;
   name: string;
@@ -263,6 +273,7 @@ interface AllSettings {
   main: MainSettings;
   plex: PlexSettings;
   tautulli: TautulliSettings;
+  trakt: TraktSettings;
   radarr: RadarrSettings[];
   sonarr: SonarrSettings[];
   public: PublicSettings;
@@ -310,6 +321,15 @@ class Settings {
         libraries: [],
       },
       tautulli: {},
+      trakt: {
+        clientId: '',
+        clientSecret: '',
+        accessToken: '',
+        refreshToken: '',
+        username: '',
+        enabled: false,
+        syncWatchlist: false,
+      },
       radarr: [],
       sonarr: [],
       public: {
@@ -464,6 +484,14 @@ class Settings {
 
   set tautulli(data: TautulliSettings) {
     this.data.tautulli = data;
+  }
+
+  get trakt(): TraktSettings {
+    return this.data.trakt;
+  }
+
+  set trakt(data: TraktSettings) {
+    this.data.trakt = data;
   }
 
   get radarr(): RadarrSettings[] {

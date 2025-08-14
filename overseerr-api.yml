@@ -1892,6 +1892,317 @@ paths:
                   appDataPath:
                     type: string
                     example: /app/config
+  /trakt/auth-url:
+    get:
+      summary: Get Trakt OAuth authorization URL
+      description: Returns the Trakt OAuth authorization URL for authentication
+      tags:
+        - settings
+      responses:
+        '200':
+          description: Trakt OAuth authorization URL
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  authUrl:
+                    type: string
+                    example: 'https://trakt.tv/oauth/authorize?response_type=code&client_id=CLIENT_ID&redirect_uri=REDIRECT_URI'
+        '400':
+          description: Trakt client ID and secret must be configured
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+  /trakt/callback:
+    get:
+      summary: Trakt OAuth callback
+      description: OAuth callback endpoint for Trakt authentication
+      tags:
+        - settings
+      parameters:
+        - name: code
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '302':
+          description: Redirect to settings page
+        '400':
+          description: Authorization code is required
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+  /trakt/me:
+    get:
+      summary: Get current Trakt user
+      description: Returns the current authenticated Trakt user profile
+      tags:
+        - settings
+      responses:
+        '200':
+          description: Trakt user profile
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  connected:
+                    type: boolean
+                  username:
+                    type: string
+                    nullable: true
+                  name:
+                    type: string
+                    nullable: true
+                  vip:
+                    type: boolean
+                    nullable: true
+                  avatar:
+                    type: string
+                    nullable: true
+        '401':
+          description: Not connected to Trakt or token expired
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  connected:
+                    type: boolean
+                  username:
+                    type: string
+                    nullable: true
+        '404':
+          description: Not connected to Trakt
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  connected:
+                    type: boolean
+                  username:
+                    type: string
+                    nullable: true
+  /trakt/disconnect:
+    post:
+      summary: Disconnect from Trakt
+      description: Disconnects the current user from Trakt
+      tags:
+        - settings
+      responses:
+        '200':
+          description: Successfully disconnected from Trakt
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: Not connected to Trakt
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+  /trakt/settings:
+    post:
+      summary: Update Trakt settings
+      description: Updates Trakt client settings
+      tags:
+        - settings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                clientId:
+                  type: string
+                clientSecret:
+                  type: string
+                syncWatchlist:
+                  type: boolean
+      responses:
+        '200':
+          description: Trakt settings updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  clientId:
+                    type: string
+                  clientSecret:
+                    type: string
+                  syncWatchlist:
+                    type: boolean
+        '500':
+          description: Failed to update Trakt settings
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+  /trakt/test-connection:
+    post:
+      summary: Test Trakt connection
+      description: Tests the connection to Trakt API
+      tags:
+        - settings
+      responses:
+        '200':
+          description: Connection test result
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  connected:
+                    type: boolean
+                  username:
+                    type: string
+                    nullable: true
+        '400':
+          description: Trakt client ID and secret not configured or not connected
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  connected:
+                    type: boolean
+        '500':
+          description: Failed to test Trakt connection
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+  /trakt/watchlist:
+    get:
+      summary: Get user's Trakt watchlist
+      description: Returns the current user's Trakt watchlist
+      tags:
+        - settings
+      parameters:
+        - name: type
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [movies, shows]
+      responses:
+        '200':
+          description: Trakt watchlist
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  type:
+                    type: string
+                  items:
+                    type: array
+                    items:
+                      type: object
+                  count:
+                    type: number
+        '401':
+          description: Not connected to Trakt
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '500':
+          description: Failed to fetch Trakt watchlist
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+  /trakt/watchlist/add:
+    post:
+      summary: Add items to Trakt watchlist
+      description: Adds media items to the user's Trakt watchlist
+      tags:
+        - settings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                mediaType:
+                  type: string
+                  enum: [movie, tv]
+                title:
+                  type: string
+                year:
+                  type: number
+                tmdbId:
+                  type: number
+      responses:
+        '200':
+          description: Items added to watchlist
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '401':
+          description: Not connected to Trakt
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+        '500':
+          description: Failed to add items to Trakt watchlist
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
   /settings/main:
     get:
       summary: Get main settings
